@@ -4,6 +4,7 @@ from Enum import *
 import time
 from timer import updateTimers
 from Test_I2C import GetTemperature
+from Outputs import UpdateOutputs
 
 EXIT = False
 
@@ -32,7 +33,11 @@ def LoadProgram():
 
     BrewConfig["StartDelayMinutes"] = 0
     BrewConfig["MASH_TEMP"] = [0,0,0,0,0,0]
-    BrewConfig["StrikeWaterTemp"] = 70 
+    BrewConfig["StrikeWaterTemp"] = 70
+
+    ## Initialize system
+
+    setpoint[VS_MASH]=0
 
 ##
 ## Start of main section
@@ -44,6 +49,8 @@ while not (EXIT):
     updateTimers()
 
     temp[VS_MASH] = GetTemperature()
+
+    UpdateOutputs ()
 
     stepCore()
     

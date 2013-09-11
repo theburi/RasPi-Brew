@@ -216,7 +216,7 @@ def stepCore():
         
 
     if (stepIsActive(STEP_PREHEAT)):
-        print "Running Active step Preheat"
+        print "Running Active step Preheat", temp[VS_MASH], "; target ", setpoint[VS_MASH]
         if (setpoint[VS_MASH] and temp[VS_MASH] >= setpoint[VS_MASH]) :
             stepAdvance(STEP_PREHEAT);
 

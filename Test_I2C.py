@@ -12,17 +12,22 @@ GetTemparatureCommand = 0X02
 SetHeatPowerCommand = 0x03
 ShowModeCommand = 0X04
 
-temp=0
+t = 0
 heat=False
 
 def HeatPower (val):
-    bus.write_i2c_block_data(address, SetHeatPowerCommand, val)
+    global heat
+    ##bus.write_i2c_block_data(address, SetHeatPowerCommand, val)
+    if val>0 : heat = True
+    else: heat = False
 
 def GetTemperature():
-    if heat : temp +=0.1
-    else: temp -=0.1
+    global t
+    if heat : t += 5
+    else:
+        if t>0 : t = t - 1
     
-    return temp
+    return t
 
 def showMode(value):
     # bus.write_byte(address, value)    
@@ -47,7 +52,7 @@ def StringToBytes(val):
 
 def resetHeatOutput(vessel):
     #send command to turn of heating
-    heat=false
+    heat =False
     #HeatPower(0)
 
 ##    

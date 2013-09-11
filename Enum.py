@@ -58,7 +58,10 @@ I2C_ADDR =0x10
 stepProgram = [PROGRAM_IDLE] * NUM_BREW_STEPS
 preheated = [False] * 4
 setpoint = {"MASH_TS_TEMP": 0}
+heatstatus = [0,0]
 
 temp = [0]*2
 
 BrewConfig = {}
+
+ESTOP = False
