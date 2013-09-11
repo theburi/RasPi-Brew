@@ -59,6 +59,7 @@ stepProgram = [PROGRAM_IDLE] * NUM_BREW_STEPS
 preheated = [False] * 4
 setpoint = {"MASH_TS_TEMP": 0}
 heatstatus = [0,0]
+mashVol = 0
 
 temp = [0]*2
 

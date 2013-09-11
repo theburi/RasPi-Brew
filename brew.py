@@ -32,9 +32,12 @@ def LoadProgram():
     stepProgram[STEP_CHILL] = PROGRAM_IDLE
 
     BrewConfig["StartDelayMinutes"] = 0
-    BrewConfig["MASH_TEMP"] = [0,0,0,0,0,0]
+    BrewConfig["MASH_TEMP"] = [30,40,50,60,70,80]
+    BrewConfig["MASH_MINUTES"] = [1,1,1,1,2,1]
     BrewConfig["StrikeWaterTemp"] = 70
 
+    ## TODO understand how mashVol and tgtVol[VS_MASH] works
+    
     ## Initialize system
 
     setpoint[VS_MASH]=0
@@ -43,8 +46,7 @@ def LoadProgram():
 ## Start of main section
 
 LoadProgram()
-while not (EXIT):
-    print stepProgram
+while not (EXIT):    
     
     updateTimers()
 

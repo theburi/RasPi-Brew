@@ -22,7 +22,7 @@ def pauseTimer(timer):
     else:
     #    //Unpause
         timerStatus[timer] = 1;
-        lastTime[timer] = datetime.now()
+        lastTime[timer] = datetime.datetime.now()
  
     setTimerStatus(timer, timerStatus[timer]);
 

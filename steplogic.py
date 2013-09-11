@@ -1,4 +1,8 @@
-﻿from Enum import *
+﻿## This is a brewtroller port to Python
+##All credits goes to brewtroller
+## TODO need to put better diclamer
+
+from Enum import *
 from timer import *
 from Test_I2C import resetHeatOutput
 
@@ -88,92 +92,85 @@ def stepInit(pgm, brewStep) :
         # Step Init: Add Grain
         # Disable HLT and Mash heat output during 'Add Grain' to avoid
         # dry running heat elements and burns from HERMS recirc
-        resetHeatOutput(VS_HLT)
         resetHeatOutput(VS_MASH)
-
-        if (getProgMLHeatSrc(pgm) == VS_HLT) :
-            spargeVol = calcSpargeVol(pgm)
-            mashVol = calcStrikeVol(pgm)
-            tgtVol[VS_HLT] = (min((spargeVol + mashVol), getCapacity(VS_HLT)) - mashVol)
-
         # In manual volume mode show the target mash volume as a guide to the user
-        tgtVol[VS_MASH] = mashVol
-    elif brewStep == STEP_DOUGHIN :
-        
-# Step Init: Dough In
-        setSetpoint(TS_HLT, getProgHLT(pgm));
-        setSetpoint(TS_MASH, getProgMashTemp(pgm, MASH_DOUGHIN));
+        ## TODO tgtVol[VS_MASH] = mashVol
 
+
+        
+        
+    elif brewStep == STEP_DOUGHIN :        
+        # Step Init: Dough In       
+        
+        setpoint[VS_MASH] = getProgMashTemp(pgm, MASH_DOUGHIN);
         preheated[VS_MASH] = 0;
-#    //Set timer only if empty (for purposed of power loss recovery)
+
+        #    //Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_DOUGHIN)); 
 #    //Leave timer paused until preheated
         timerStatus[TIMER_MASH] = 0;
 
     elif (brewStep == STEP_ACID):        
-#  //Step Init: Acid Rest
-        setSetpoint(TS_HLT, getProgHLT(pgm));
-        setSetpoint(TS_MASH, getProgMashTemp(pgm, MASH_ACID));
+        #  //Step Init: Acid Rest
+        
+        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_ACID);
         preheated[VS_MASH] = 0;
-#    //Set timer only if empty (for purposed of power loss recovery)
+        #    //Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_ACID)); 
-#    //Leave timer paused until preheated
+        #    //Leave timer paused until preheated
         timerStatus[TIMER_MASH] = 0;
 
     elif (brewStep == STEP_PROTEIN) :
-#  //Step Init: Protein
-        setSetpoint(TS_HLT, getProgHLT(pgm));
-        setSetpoint(TS_MASH, getProgMashTemp(pgm, MASH_PROTEIN));
+        # Step Init: Protein        
+        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_PROTEIN);
         preheated[VS_MASH] = 0;
-#    //Set timer only if empty (for purposed of power loss recovery)
+
+        # Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_PROTEIN)); 
-#    //Leave timer paused until preheated
+        # Leave timer paused until preheated
         timerStatus[TIMER_MASH] = 0;
 
     elif (brewStep == STEP_SACCH) :
-#  //Step Init: Sacch
-        setSetpoint(TS_HLT, getProgHLT(pgm));
-        setSetpoint(TS_MASH, getProgMashTemp(pgm, MASH_SACCH));
+        #  //Step Init: Sacch
+
+        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_SACCH);
         preheated[VS_MASH] = 0;
-#    //Set timer only if empty (for purposed of power loss recovery)
+        #    //Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_SACCH)); 
-#    //Leave timer paused until preheated
+        #    //Leave timer paused until preheated
         timerStatus[TIMER_MASH] = 0;
 
     elif (brewStep == STEP_SACCH2):
-#  //Step Init: Sacch2
-        setSetpoint(TS_HLT, getProgHLT(pgm));
-        setSetpoint(TS_MASH, getProgMashTemp(pgm, MASH_SACCH));
+        #  //Step Init: Sacch2
+        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_SACCH);
         preheated[VS_MASH] = 0;
-#    //Set timer only if empty (for purposed of power loss recovery)
+        #    //Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_SACCH2)); 
-#    //Leave timer paused until preheated
+        #    //Leave timer paused until preheated
         timerStatus[TIMER_MASH] = 0;
 
     elif (brewStep == STEP_MASHOUT):
-#  //Step Init: Mash Out
-        setSetpoint(TS_HLT, getProgHLT(pgm));
-        setSetpoint(TS_MASH, getProgMashTemp(pgm, MASH_SACCH));
+        #  //Step Init: Mash Out
+        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_SACCH);
         preheated[VS_MASH] = 0;
-#    //Set timer only if empty (for purposed of power loss recovery)
+        #    //Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_MASHOUT)); 
-#    //Leave timer paused until preheated
+        #    //Leave timer paused until preheated
         timerStatus[TIMER_MASH] = 0;
 
     elif (brewStep == STEP_MASHHOLD):
-#    //Set HLT to Sparge Temp
-        setSetpoint(TS_HLT, getProgSparge(pgm));
-#    //Cycle through steps and use last non-zero step for mash setpoint
+        #    //Set HLT to Sparge Temp
+        #    //Cycle through steps and use last non-zero step for mash setpoint
         if (not(setpoint[TS_MASH])):
             i = MASH_MASHOUT;
         while (setpoint[TS_MASH] == 0 and i >= MASH_DOUGHIN and i <= MASH_MASHOUT):
-                setSetpoint(TS_MASH, getProgMashTemp(pgm, i-1))
+                setSetpoint[TS_MASH] = getProgMashTemp(pgm, i-1)
                            
     elif (brewStep == STEP_BOIL):
 #  //Step Init: Boil
@@ -225,12 +222,15 @@ def stepCore():
         if (timerValue[TIMER_MASH] == 0):
             stepAdvance(STEP_DELAY);
 
-#    if (stepIsActive(STEP_ADDGRAIN)):
+    if (stepIsActive(STEP_ADDGRAIN)):
+        ## TODO understand how input would work here
+        stepAdvance(STEP_ADDGRAIN)
+        
+    if (stepIsActive(STEP_REFILL)):
+        stepFill(STEP_REFILL);
 
-    if (stepIsActive(STEP_REFILL)): stepFill(STEP_REFILL);
-
-    MashSteps = [STEP_DOUGHIN, STEP_MASHOUT]
-    for brewStep in MashSteps :
+##    MashSteps = [STEP_DOUGHIN, STEP_MASHOUT]
+    for brewStep in range (STEP_DOUGHIN, STEP_MASHOUT):
         if (stepIsActive(brewStep)):
             stepMash(brewStep);
 
@@ -442,3 +442,13 @@ def setProgramStep(brewStep, actPgm):
 def getProgPitch(pgm):
     ##TODO calc pitch temp
     return 70
+
+
+def getProgMashTemp(actStep, mashstep):
+    
+    return BrewConfig["MASH_TEMP"][mashstep]
+
+
+def getProgMashMins(actStep, mashstep):
+    
+    return BrewConfig["MASH_MINUTES"][mashstep]
