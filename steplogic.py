@@ -109,7 +109,8 @@ def stepInit(pgm, brewStep) :
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_DOUGHIN)); 
 #    //Leave timer paused until preheated
-        timerStatus[TIMER_MASH] = 0;
+        pauseTimer(TIMER_MASH)
+        print "Initializing Dough In..."
 
     elif (brewStep == STEP_ACID):        
         #  //Step Init: Acid Rest
@@ -170,7 +171,8 @@ def stepInit(pgm, brewStep) :
         if (not(setpoint[TS_MASH])):
             i = MASH_MASHOUT;
         while (setpoint[TS_MASH] == 0 and i >= MASH_DOUGHIN and i <= MASH_MASHOUT):
-                setSetpoint[TS_MASH] = getProgMashTemp(pgm, i-1)
+                i=i-1
+                setSetpoint[TS_MASH] = getProgMashTemp(pgm, i)
                            
     elif (brewStep == STEP_BOIL):
 #  //Step Init: Boil
@@ -285,7 +287,7 @@ def stepFill(brewStep):
 #//stepCore Logic for all mash steps
 def stepMash(brewStep):
 #    smartHERMSHLT();
-    if not(preheated[VS_MASH] and temp[TS_MASH] >= setpoint[VS_MASH]):
+    if not(preheated[VS_MASH] and temp[VS_MASH] >= setpoint[VS_MASH]):
         preheated[VS_MASH] = 1;
 #    //Unpause Timer
     if not(timerStatus[TIMER_MASH]): pauseTimer(TIMER_MASH)

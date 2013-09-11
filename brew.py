@@ -54,6 +54,10 @@ while not (EXIT):
 
     UpdateOutputs ()
 
+    ##processUserCommands()
+
+    ##WriteState()
+
     stepCore()
     
     time.sleep(2)
