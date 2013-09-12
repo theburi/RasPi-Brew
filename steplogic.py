@@ -83,7 +83,6 @@ def stepInit(pgm, brewStep) :
         
         setpoint[VS_MASH]= calcStrikeTemp(pgm)
 
-        preheated[VS_HLT] = 0
         preheated[VS_MASH] = 0
         #   No timer used for preheat
         clearTimer(TIMER_MASH)
@@ -136,7 +135,7 @@ def stepInit(pgm, brewStep) :
 
     elif (brewStep == STEP_SACCH) :
         #  //Step Init: Sacch
-
+        print "Initializing SACCH ..." 
         setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_SACCH);
         preheated[VS_MASH] = 0;
         #    //Set timer only if empty (for purposed of power loss recovery)
@@ -147,7 +146,8 @@ def stepInit(pgm, brewStep) :
 
     elif (brewStep == STEP_SACCH2):
         #  //Step Init: Sacch2
-        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_SACCH);
+        print "Initializing SACH2 ..." 
+        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_SACCH2);
         preheated[VS_MASH] = 0;
         #    //Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
@@ -157,15 +157,18 @@ def stepInit(pgm, brewStep) :
 
     elif (brewStep == STEP_MASHOUT):
         #  //Step Init: Mash Out
-        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_SACCH);
+        print "Initializing MashOut ..." 
+        setpoint[TS_MASH] = getProgMashTemp(pgm, MASH_MASHOUT);
         preheated[VS_MASH] = 0;
         #    //Set timer only if empty (for purposed of power loss recovery)
         if (not(timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_MASHOUT)); 
         #    //Leave timer paused until preheated
         timerStatus[TIMER_MASH] = 0;
+        print "Exit Initialization MashOut ..." 
 
     elif (brewStep == STEP_MASHHOLD):
+        print "Initializing MASH HOLD step ", setpoint[TS_MASH]
         #    //Set HLT to Sparge Temp
         #    //Cycle through steps and use last non-zero step for mash setpoint
         if (not(setpoint[TS_MASH])):
@@ -175,26 +178,28 @@ def stepInit(pgm, brewStep) :
                 setSetpoint[TS_MASH] = getProgMashTemp(pgm, i)
                            
     elif (brewStep == STEP_BOIL):
-#  //Step Init: Boil
-        resetHeatOutput(VS_PUMP); # turn off the pump if we are moving to boil. 
-        setSetpoint(VS_KETTLE, getBoilTemp());
+        #  //Step Init: Boil
+        print "Initializing BOIL step ", setpoint[TS_MASH]
+        ## TODO Pump
+        ## resetHeatOutput(VS_PUMP); # turn off the pump if we are moving to boil. 
+        setpoint[VS_KETTLE] = getBoilTemp();
         preheated[VS_KETTLE] = 0;
-        boilAdds = getProgAdds(pgm);
+        ##boilAdds = getProgAdds(pgm);
 
 #    //Set timer only if empty (for purposes of power loss recovery)
         if (not(timerValue[TIMER_BOIL])) :
 #      //Clean start of Boil
             setTimer(TIMER_BOIL, getProgBoil(pgm));
             triggered = 0;
-            setBoilAddsTrig(triggered);
-        else :
+            ##setBoilAddsTrig(triggered);
+        ##else :
 #      //Assuming power loss recovery
-            triggered = getBoilAddsTrig();
+            ##triggered = getBoilAddsTrig();
 
 #    //Leave timer paused until preheated
         timerStatus[TIMER_BOIL] = 0;
         lastHop = 0;
-        boilControlState = CONTROLSTATE_AUTO;
+        ##boilControlState = CONTROLSTATE_AUTO;
 
     elif (brewStep == STEP_CHILL) :
 #  //Step Init: Chill
@@ -231,18 +236,21 @@ def stepCore():
     if (stepIsActive(STEP_REFILL)):
         stepFill(STEP_REFILL);
 
-##    MashSteps = [STEP_DOUGHIN, STEP_MASHOUT]
-    for brewStep in range (STEP_DOUGHIN, STEP_MASHOUT):
+
+    for brewStep in range (STEP_DOUGHIN, STEP_MASHOUT+1):
         if (stepIsActive(brewStep)):
             stepMash(brewStep);
 
     if (stepIsActive(STEP_MASHHOLD)):
+        print "Running MASH HOLD. Boil ZONE is ", zoneIsActive(ZONE_BOIL)
         if ( not(zoneIsActive(ZONE_BOIL))):
             stepAdvance(STEP_MASHHOLD);
 
-#    if (stepIsActive(STEP_SPARGE)):
+    if (stepIsActive(STEP_SPARGE)):
+        stepAdvance(STEP_SPARGE);
 
     if (stepIsActive(STEP_BOIL)):
+        print "BOILING ", timerValue[TIMER_BOIL]
 #    PREBOIL_ALARM
         ## TODO figure this out
 ##        if not((triggered & 32768) and temp[TS_KETTLE] >= PREBOIL_ALARM) :
@@ -273,10 +281,17 @@ def stepCore():
 ##                setBoilAddsTrig(triggered);
 
 #    //Exit Condition  
-    if(preheated[VS_KETTLE] and timerValue[TIMER_BOIL] == 0): stepAdvance(STEP_BOIL);
+        if(preheated[VS_KETTLE] and timerValue[TIMER_BOIL] == 0):
+            stepAdvance(STEP_BOIL);
 
-#    if (stepIsActive(STEP_CHILL)):
+    if (stepIsActive(STEP_CHILL)):
+        stepAdvance(STEP_CHILL);
 
+        
+    if (stepIsActive(STEP_DONE)):
+        global EXIT
+        print "Exiting"
+        EXIT= True
 
 #//stepCore logic for Fill and Refill
 def stepFill(brewStep):
@@ -293,6 +308,8 @@ def stepMash(brewStep):
     if not(timerStatus[TIMER_MASH]): pauseTimer(TIMER_MASH)
 
 #  //Exit Condition (and skip unused mash steps)
+    print "DEBUG: Exit Conditions ", setpoint[VS_MASH] == 0 , preheated[VS_MASH], timerValue[TIMER_MASH] == 0
+    
     if (setpoint[VS_MASH] == 0 or (preheated[VS_MASH] and timerValue[TIMER_MASH] == 0)):
         stepAdvance(brewStep);
 
@@ -330,18 +347,18 @@ def stepExit(brewStep):
 
     elif (brewStep == STEP_ADDGRAIN):        
 #  //Step Exit: Add Grain
-        resetHeatOutput(VS_HLT);
+        print "Exit Add Grain"    
 
     elif (brewStep == STEP_PREHEAT or (brewStep >= STEP_DOUGHIN and brewStep <= STEP_MASHHOLD)):
 #  //Step Exit: Preheat/Mash
         clearTimer(TIMER_MASH);
-        resetHeatOutput(VS_HLT);
+
         resetHeatOutput(VS_MASH);
 
 #    elif (brewStep == STEP_SPARGE):
 #  //Step Exit: Sparge
 
-#    elif (brewStep == STEP_BOIL):
+    elif (brewStep == STEP_BOIL):
 #  //Step Exit: Boil
 #    TODO 0 Min Addition
 ##    if ((boilAdds ^ triggered) & 2048):
@@ -439,6 +456,7 @@ def getFirstStepTemp(pgm):
 
 def setProgramStep(brewStep, actPgm):
     global stepProgram
+    
     stepProgram[brewStep] = actPgm
 
 def getProgPitch(pgm):
@@ -454,3 +472,11 @@ def getProgMashTemp(actStep, mashstep):
 def getProgMashMins(actStep, mashstep):
     
     return BrewConfig["MASH_MINUTES"][mashstep]
+
+
+def getBoilTemp():
+    return BrewConfig["BOIL_TEMP"]
+
+
+def getProgBoil(pgm):
+    return BrewConfig["BOIL_TIME"]

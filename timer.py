@@ -36,7 +36,7 @@ def clearTimer(timer):
 
 def updateTimers():
     dt = datetime.datetime.now()
-    for timer in range (TIMER_MASH, TIMER_BOIL) :
+    for timer in range (TIMER_MASH, TIMER_BOIL+1) :
         if (timerStatus[timer]):
             now = dt
         

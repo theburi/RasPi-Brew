@@ -30,11 +30,14 @@ def LoadProgram():
     stepProgram[STEP_SPARGE] = PROGRAM_IDLE
     stepProgram[STEP_BOIL] = PROGRAM_IDLE
     stepProgram[STEP_CHILL] = PROGRAM_IDLE
+    stepProgram[STEP_DONE] = PROGRAM_IDLE
 
     BrewConfig["StartDelayMinutes"] = 0
     BrewConfig["MASH_TEMP"] = [30,40,50,60,70,80]
-    BrewConfig["MASH_MINUTES"] = [1,1,1,1,2,1]
+    BrewConfig["MASH_MINUTES"] = [0,0,0,0,1,1]
     BrewConfig["StrikeWaterTemp"] = 70
+    BrewConfig["BOIL_TEMP"] = 100
+    BrewConfig["BOIL_TIME"] = 5
 
     ## TODO understand how mashVol and tgtVol[VS_MASH] works
     
