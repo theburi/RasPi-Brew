@@ -5,9 +5,11 @@ import time
 from timer import updateTimers
 from Test_I2C import GetTemperature
 from Outputs import UpdateOutputs
+import os
+import errno
 
 EXIT = False
-
+pipeName = '/tmp/BrewStatePipe'
 
 
 
@@ -45,10 +47,26 @@ def LoadProgram():
 
     setpoint[VS_MASH]=0
 
+
+
+def WriteState():
+
+    f = open( pipeName, 'w')
+    f.write ("<state>\n")
+    f.write ("<temperature>" + str( temp[VS_MASH]) + "</temperature>\n")
+    f.write ("<heater>" + str( heatstatus[VS_MASH]) + "</heater>\n")
+    f.write ("</state>\n")
+    print "."
+    
+
 ##
 ## Start of main section
 
 LoadProgram()
+
+ 
+
+
 while not (EXIT):    
     
     updateTimers()
@@ -59,9 +77,9 @@ while not (EXIT):
 
     ##processUserCommands()
 
-    ##WriteState()
+    WriteState()
 
-    stepCore()
+    EXIT = stepCore()
     
     time.sleep(2)
     
