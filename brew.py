@@ -13,7 +13,7 @@ from xml.etree.ElementTree import SubElement
 
 
 EXIT = False
-pipeName = '/tmp/BrewState.xml'
+pipeName = '/tmp/brewState.xml'
 
 
 def LoadProgram():
