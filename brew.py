@@ -59,7 +59,7 @@ def WriteState():
     temperature = SubElement(membership, 'temperature')
     temperature.text = str(temp[VS_MASH])
     heaterStatus = SubElement(membership, 'heater')
-    heaterStatus = str(heatstatus[VS_MASH])
+    heaterStatus.text = str(heatstatus[VS_MASH])
 
     try:
         output_file = open(pipeName, 'w')
