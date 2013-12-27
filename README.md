@@ -9,67 +9,39 @@ Python
 
 I2C SUB
 
-NGIX
-	sudo apt-get install ngnix python-flup
+* LIGHTTPD
+	** sudo apt-get install lighttpd python-flup
 
-	sudo service nginx start
 
-	sudo nano /etc/ngnix/sites-available/default
-"
-	server {
-        listen       80;
-        server_name  _;
 
-        #charset koi8-r;
+	** sudo nano /etc/lighttpd/lighttpd.conf
 
-        #access_log  logs/host.access.log  main;
+	1. Add
+	server.modules = (
+        .....
+        "mod_fastcgi",
+    )
+    2. Add
+    fastcgi.server = (
+        ".py" => (
+                "python-fcgi" => (
+                        "socket" => "/tmp/fastcgi.python.socket",
+                        "bin-path" => "/var/www/brew/index.py",
+                        "check-local" => "disable",
+                        "max-procs" => 1)
+                )
+)
 
-        # Get people onto the non-www site
-        if ($host = 'www.example.com' ) {
-            rewrite  ^/(.*)$  http://example.com/$1  permanent;
-        }
+    ** Clone Git into /home/RasPi-Brew
 
-        # project media assuming it's called at media/
-        # keep in mind that media/ will be maintained as a directory by the root command
-        location ^~ /media/ {
-            root   /site/where/project/is;
-        }
+    ** add to nano /etc/modules
 
-        # admin uses admin-media/
-        # alias works different than root above by dropping admin-media
-        location ^~ /admin-media/ {
-            alias /var/lib/python-support/python2.6/django/contrib/admin/media/;
-        }
+        # 1-Wire devices
+        w1-gpio
+        # 1-Wire thermometer devices
+        w1-therm
 
-        location / {
-            # host and port to fastcgi server
-            fastcgi_pass 127.0.0.1:8080;
-            fastcgi_param SERVER_NAME $server_name;
-            fastcgi_param SERVER_PORT $server_port;
-            fastcgi_param SERVER_PROTOCOL $server_protocol;
-            fastcgi_param PATH_INFO $fastcgi_script_name;
-            fastcgi_param REQUEST_METHOD $request_method;
-            fastcgi_param QUERY_STRING $query_string;
-            fastcgi_param CONTENT_TYPE $content_type;
-            fastcgi_param CONTENT_LENGTH $content_length;
-            fastcgi_pass_header Authorization;
-            fastcgi_intercept_errors off;
-            }
-
-        # todo: setup 404 for the /media directory.
-        # / directory will be handled by django url dispatcher
-        #error_page  404              /404.html;
-        #location = /404.html {
-        #    root   /var/www/nginx-default;
-        #}
-
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   /var/www/nginx-default;
-        }
-
-    }
-"
- 
+    ** with Sensor connected check
+        cd /sys/bus/w1/devices/
+        ls
+        A sensor ID must be displayed. take a note of it.

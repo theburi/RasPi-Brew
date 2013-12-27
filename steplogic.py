@@ -4,7 +4,7 @@
 
 from Enum import *
 from timer import *
-from Test_I2C import resetHeatOutput
+from hardwarecontrol import resetHeatOutput
 
 
 # unsigned long lastHop, grainInStart;

@@ -1,6 +1,6 @@
 from Enum import *
-from Test_I2C import GetTemperature
-from Test_I2C import HeatPower
+from hardwarecontrol import GetTemperature
+from hardwarecontrol import HeatPower
 
 
 def UpdateOutputs():
