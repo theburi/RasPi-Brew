@@ -24,7 +24,9 @@ def WaitForUserAction():
 
     output_file = open(ActionPipeName, "r")
     for line in output_file:
-        if str(a_id) in line:
-            return False
+        if line.count()>3:
+            [text,action, number] = line.split(';')
+            if int(number)>0:
+                return False
 
     return True
