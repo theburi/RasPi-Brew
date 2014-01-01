@@ -22,7 +22,7 @@ def LoadProgram():
     global stepProgram
     global BrewConfig
 
-    stepProgram[STEP_FILL] = PROGRAM_IDLE
+    stepProgram[STEP_FILL] = STEP_FILL
     stepProgram[STEP_DELAY] = PROGRAM_IDLE
     stepProgram[STEP_PREHEAT] = PROGRAM_IDLE
     stepProgram[STEP_ADDGRAIN] = PROGRAM_IDLE
