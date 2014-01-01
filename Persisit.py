@@ -1,3 +1,4 @@
+import os
 from random import random
 
 a_id = 0
@@ -15,6 +16,12 @@ def SetUserAction(text, action):
 
 
 def WaitForUserAction():
+
+    if not (os.path.exists(ActionPipeName)):
+        file = open(ActionPipeName, 'w')
+        file.close()
+
+
     output_file = open(ActionPipeName, "r")
     for line in output_file:
         if a_id in line:
