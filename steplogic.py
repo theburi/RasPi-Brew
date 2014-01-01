@@ -83,6 +83,7 @@ def stepInit(pgm, brewStep):
 
     if brewStep == STEP_FILL:
         SetUserAction("Fill the tun", "Next")
+        print "Started FILL_STEP"
         #   Step Init: Fill
     #   REMOVED Section   
 
