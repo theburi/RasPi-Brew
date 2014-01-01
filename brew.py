@@ -46,6 +46,8 @@ def LoadProgram():
     BrewConfig["BOIL_TEMP"] = 100
     BrewConfig["BOIL_TIME"] = 5
 
+    stepInit(STEP_FILL, STEP_FILL)
+
     ## TODO understand how mashVol and tgtVol[VS_MASH] works
 
     ## Initialize system
