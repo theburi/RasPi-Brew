@@ -71,11 +71,12 @@ def stepInit(pgm, brewStep):
     if pgm == PROGRAM_IDLE: return 1
 
     # Abort Fill/Mash step init if mash Zone is not free
-    if STEP_FILL <= brewStep <= STEP_MASHHOLD and zoneIsActive(ZONE_MASH):
-        return 1
+    #if STEP_FILL <= brewStep <= STEP_MASHHOLD and zoneIsActive(ZONE_MASH):
+    #    print 'ERROR: ZONE_MASJ is not free'
+    #    return 1
     # Abort sparge init if either zone is currently active
-    elif brewStep == STEP_SPARGE and (zoneIsActive(ZONE_MASH) or zoneIsActive(ZONE_BOIL)):
-        return 1
+    #elif brewStep == STEP_SPARGE and (zoneIsActive(ZONE_MASH) or zoneIsActive(ZONE_BOIL)):
+    #    return 1
         # Allow Boil step init while sparge is still going
 
     # If we made it without an abort, save the program number for stepCore
