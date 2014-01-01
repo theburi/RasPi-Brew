@@ -1,12 +1,12 @@
 ﻿# coding=utf-8
 ## This is a brewtroller port to Python
 ##All credits goes to brewtroller
-## TODO need to put better diclamer
+## TODO need to put better disclaimer
 
 from Enum import *
 from timer import *
 from hardwarecontrol import resetHeatOutput
-from brew import SetUserAction, WaitForUserAction
+from Persisit import SetUserAction, WaitForUserAction
 
 # unsigned long lastHop, grainInStart;
 # unsigned int boilAdds, triggered;
@@ -15,7 +15,7 @@ from brew import SetUserAction, WaitForUserAction
 # Used to determine if the given step is the active step in the program.
 
 def stepIsActive(brewStep):
-    if (stepProgram[brewStep] == PROGRAM_IDLE):
+    if stepProgram[brewStep] == PROGRAM_IDLE:
         return False
     else:
         return True
@@ -25,28 +25,40 @@ def stepIsActive(brewStep):
 # Returns true is any step in the given ZONE is the active step, false otherwise.
 
 def zoneIsActive(brewZone):
-    if (brewZone == ZONE_MASH):
-        if stepIsActive(STEP_FILL): return 1
-        if stepIsActive(STEP_DELAY): return 1
-        if stepIsActive(STEP_PREHEAT): return 1
-        if stepIsActive(STEP_ADDGRAIN): return 1
-        if stepIsActive(STEP_REFILL): return 1
-        if stepIsActive(STEP_DOUGHIN): return 1
-        if stepIsActive(STEP_ACID): return 1
-        if stepIsActive(STEP_PROTEIN): return 1
-        if stepIsActive(STEP_SACCH): return 1
-        if stepIsActive(STEP_SACCH2): return 1
-        if stepIsActive(STEP_MASHOUT): return 1
-        if stepIsActive(STEP_MASHHOLD): return 1
+    if brewZone == ZONE_MASH:
+        if stepIsActive(STEP_FILL):
+            return 1
+        if stepIsActive(STEP_DELAY):
+            return 1
+        if stepIsActive(STEP_PREHEAT):
+            return 1
+        if stepIsActive(STEP_ADDGRAIN):
+            return 1
+        if stepIsActive(STEP_REFILL):
+            return 1
+        if stepIsActive(STEP_DOUGHIN):
+            return 1
+        if stepIsActive(STEP_ACID):
+            return 1
+        if stepIsActive(STEP_PROTEIN):
+            return 1
+        if stepIsActive(STEP_SACCH):
+            return 1
+        if stepIsActive(STEP_SACCH2):
+            return 1
+        if stepIsActive(STEP_MASHOUT):
+            return 1
+        if stepIsActive(STEP_MASHHOLD):
+            return 1
         if stepIsActive(STEP_SPARGE):
             return 1
         else:
             return 0
-    elif (brewZone == ZONE_BOIL):
-        if (stepIsActive(STEP_BOIL) or stepIsActive(STEP_CHILL) ):
+    elif brewZone == ZONE_BOIL:
+        if stepIsActive(STEP_BOIL) or stepIsActive(STEP_CHILL):
             return 1
         else:
-            return 0;
+            return 0
 
 
 # Returns 0 if start was successful or 1 if unable to start due to conflict with other step
@@ -56,22 +68,22 @@ def stepInit(pgm, brewStep):
     print pgm, brewStep
 
     # Nothing more to do if starting 'Idle' program
-    if (pgm == PROGRAM_IDLE): return 1
+    if pgm == PROGRAM_IDLE: return 1
 
     # Abort Fill/Mash step init if mash Zone is not free
-    if (brewStep >= STEP_FILL and brewStep <= STEP_MASHHOLD and zoneIsActive(ZONE_MASH)):
+    if STEP_FILL <= brewStep <= STEP_MASHHOLD and zoneIsActive(ZONE_MASH):
         return 1
     # Abort sparge init if either zone is currently active
-    elif (brewStep == STEP_SPARGE and (zoneIsActive(ZONE_MASH) or zoneIsActive(ZONE_BOIL))):
+    elif brewStep == STEP_SPARGE and (zoneIsActive(ZONE_MASH) or zoneIsActive(ZONE_BOIL)):
         return 1
         # Allow Boil step init while sparge is still going
 
     # If we made it without an abort, save the program number for stepCore
     setProgramStep(brewStep, pgm)
 
-    if (brewStep == STEP_FILL):
+    if brewStep == STEP_FILL:
         SetUserAction("Fill the tun", "Next")
-    #   Step Init: Fill
+        #   Step Init: Fill
     #   REMOVED Section   
 
     if (brewStep == STEP_DELAY):

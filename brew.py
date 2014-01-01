@@ -72,32 +72,13 @@ def WriteState():
         print 'Error'
 
 
-a_id = 0
-
-
-def SetUserAction(text, action):
-    try:
-        a_id = int(random() * 100)
-        output_file = open(ActionPipeName, "w")
-        output_file.write('%s;%s;%s\n' % (text, action, a_id))
-    except:
-        print 'Error'
-
-
-def WaitForUserAction():
-    output_file = open(ActionPipeName, "r")
-    for line in output_file:
-        if a_id in line:
-            return False
-
-    return True
 
 ##
 ## Start of main section
 
 LoadProgram()
 
-while not (EXIT):
+while not EXIT:
     updateTimers()
 
     temp[VS_MASH] = GetTemperature()
@@ -111,4 +92,4 @@ while not (EXIT):
     EXIT = stepCore()
 
     time.sleep(2)
-    
+
