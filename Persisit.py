@@ -24,7 +24,7 @@ def WaitForUserAction():
 
     output_file = open(ActionPipeName, "r")
     for line in output_file:
-        if a_id in line:
+        if str(a_id) in line:
             return False
 
     return True
