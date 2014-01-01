@@ -1,4 +1,5 @@
 ## this is a main module to run main loop
+from random import random
 from steplogic import *
 from Enum import *
 import time
@@ -14,6 +15,7 @@ from xml.etree.ElementTree import SubElement
 
 EXIT = False
 pipeName = '/tmp/brewState.xml'
+ActionPipeName = '/tmp/ActionPipeName'
 
 
 def LoadProgram():
@@ -68,6 +70,27 @@ def WriteState():
         output_file.close()
     except:
         print 'Error'
+
+
+a_id = 0
+
+
+def SetUserAction(text, action):
+    try:
+        a_id = int(random() * 100)
+        output_file = open(ActionPipeName, "w")
+        output_file.write('%s;%s;%s\n' % (text, action, a_id))
+    except:
+        print 'Error'
+
+
+def WaitForUserAction():
+    output_file = open(ActionPipeName, "r")
+    for line in output_file:
+        if a_id in line:
+            return False
+
+    return True
 
 ##
 ## Start of main section

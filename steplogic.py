@@ -6,7 +6,7 @@
 from Enum import *
 from timer import *
 from hardwarecontrol import resetHeatOutput
-
+from brew import SetUserAction, WaitForUserAction
 
 # unsigned long lastHop, grainInStart;
 # unsigned int boilAdds, triggered;
@@ -64,12 +64,13 @@ def stepInit(pgm, brewStep):
     # Abort sparge init if either zone is currently active
     elif (brewStep == STEP_SPARGE and (zoneIsActive(ZONE_MASH) or zoneIsActive(ZONE_BOIL))):
         return 1
-    # Allow Boil step init while sparge is still going
+        # Allow Boil step init while sparge is still going
 
     # If we made it without an abort, save the program number for stepCore
     setProgramStep(brewStep, pgm)
 
-    #    if (brewStep == STEP_FILL):
+    if (brewStep == STEP_FILL):
+        SetUserAction("Fill the tun", "Next")
     #   Step Init: Fill
     #   REMOVED Section   
 
@@ -109,7 +110,7 @@ def stepInit(pgm, brewStep):
         #    //Set timer only if empty (for purposed of power loss recovery)
         if (not (timerValue[TIMER_MASH])):
             setTimer(TIMER_MASH, getProgMashMins(pgm, MASH_DOUGHIN));
-        #    //Leave timer paused until preheated
+            #    //Leave timer paused until preheated
         pauseTimer(TIMER_MASH)
         print "Initializing Dough In..."
 
@@ -169,17 +170,17 @@ def stepInit(pgm, brewStep):
         timerStatus[TIMER_MASH] = 0;
         print "Exit Initialization MashOut ..."
 
-    elif (brewStep == STEP_MASHHOLD):
+    elif brewStep == STEP_MASHHOLD:
         print "Initializing MASH HOLD step ", setpoint[TS_MASH]
         #    //Set HLT to Sparge Temp
         #    //Cycle through steps and use last non-zero step for mash setpoint
-        if (not (setpoint[TS_MASH])):
+        if not (setpoint[TS_MASH]):
             i = MASH_MASHOUT;
-        while (setpoint[TS_MASH] == 0 and i >= MASH_DOUGHIN and i <= MASH_MASHOUT):
-            i = i - 1
-            setSetpoint[TS_MASH] = getProgMashTemp(pgm, i)
+        while setpoint[TS_MASH] == 0 and MASH_DOUGHIN <= i <= MASH_MASHOUT:
+            i -= 1
+            setpoint[TS_MASH] = getProgMashTemp(pgm, i)
 
-    elif (brewStep == STEP_BOIL):
+    elif brewStep == STEP_BOIL:
         #  //Step Init: Boil
         print "Initializing BOIL step ", setpoint[TS_MASH]
         ## TODO Pump
@@ -203,14 +204,14 @@ def stepInit(pgm, brewStep):
         lastHop = 0;
         ##boilControlState = CONTROLSTATE_AUTO;
 
-    elif (brewStep == STEP_CHILL):
+    elif brewStep == STEP_CHILL:
     #  //Step Init: Chill
         pitchTemp = getProgPitch(pgm);
 
 
-    #  //Call event handler
-    ##  TODO replace event with writing to file so that webserver can pick up
-    #eventHandler(EVENT_STEPINIT, brewStep)
+        #  //Call event handler
+        ##  TODO replace event with writing to file so that webserver can pick up
+        #eventHandler(EVENT_STEPINIT, brewStep)
 
 
 def stepCore():
@@ -221,7 +222,7 @@ def stepCore():
 
     if (stepIsActive(STEP_PREHEAT)):
         print "Running Active step Preheat", temp[VS_MASH], "; target ", setpoint[VS_MASH]
-        if (setpoint[VS_MASH] and temp[VS_MASH] >= setpoint[VS_MASH]):
+        if setpoint[VS_MASH] and temp[VS_MASH] >= setpoint[VS_MASH]:
             stepAdvance(STEP_PREHEAT);
 
     if (stepIsActive(STEP_DELAY)):
@@ -281,7 +282,7 @@ def stepCore():
 
         #    //Exit Condition  
         if (preheated[VS_KETTLE] and timerValue[TIMER_BOIL] == 0):
-            stepAdvance(STEP_BOIL);
+            stepAdvance(STEP_BOIL)
 
     if (stepIsActive(STEP_CHILL)):
         stepAdvance(STEP_CHILL);
@@ -294,7 +295,8 @@ def stepCore():
 #//stepCore logic for Fill and Refill
 def stepFill(brewStep):
     # TODO add loginc to wait to start for fill stage aka Manual fill
-    stepAdvance(brewStep)
+    if WaitForUserAction():
+        stepAdvance(brewStep)
 
 
 #//stepCore Logic for all mash steps
@@ -303,7 +305,7 @@ def stepMash(brewStep):
 
     if not (preheated[VS_MASH] and temp[VS_MASH] >= setpoint[VS_MASH]):
         preheated[VS_MASH] = 1;
-    #    //Unpause Timer
+        #    //Unpause Timer
     if not (timerStatus[TIMER_MASH]): pauseTimer(TIMER_MASH)
 
     #  //Exit Condition (and skip unused mash steps)
@@ -328,7 +330,7 @@ def stepAdvance(brewStep):
             print "Step Advance ->" + str(brewStep)
             return 1;
 
-        #  //Init Successful
+            #  //Init Successful
     return 0;
 
 
