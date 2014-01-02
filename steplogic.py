@@ -230,7 +230,7 @@ def stepInit(pgm, brewStep):
 
 def stepCore():
     global stepProgram
-    if (stepIsActive(STEP_FILL)):
+    if stepIsActive(STEP_FILL):
         print "Running Active Step fill"
         stepFill(STEP_FILL);
 
@@ -476,6 +476,7 @@ def setProgramStep(brewStep, actPgm):
     global stepProgram
 
     stepProgram[brewStep] = actPgm
+
 
 
 def getProgPitch(pgm):

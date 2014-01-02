@@ -1,5 +1,6 @@
 ## this is a main module to run main loop
 from random import random
+import traceback
 from steplogic import *
 from Enum import *
 import time
@@ -56,10 +57,16 @@ def LoadProgram():
 
 
 def WriteState():
-# <membership/>
+    global stepProgram
+    global ProgramNames
+    # <membership/>
     membership = Element('state')
 
     # <membership><users/>
+    steps = SubElement(membership, 'steps')
+    for key, step in enumerate(stepProgram):
+        StepNode = SubElement(steps, 'step', attrib={'name': ProgramNames[key], 'status': str(step)})
+
     temperature = SubElement(membership, 'temperature')
     temperature.text = str(temp[VS_MASH])
     heaterStatus = SubElement(membership, 'heater')
@@ -70,9 +77,10 @@ def WriteState():
         output_file.write('<?xml version="1.0"?>')
         output_file.write(ElementTree.tostring(membership))
         output_file.close()
-    except:
-        print 'Error'
-
+    except Exception as e:
+        print e
+        traceback.print_exc()
+        raise
 
 
 ##
