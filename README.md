@@ -45,3 +45,17 @@ I2C SUB
         cd /sys/bus/w1/devices/
         ls
         A sensor ID must be displayed. take a note of it.
+        
+    ** configure wirelss Ad-hoc
+    auto wlan0
+	iface wlan0 inet static
+    	address 192.168.1.1
+    	netmask 255.255.255.0
+    	wireless-channel 1
+    	wireless-essid MyNETWORK
+    	wireless-mode ad-hoc
+    	
+    **  sudo cp service.sh /etc/init.d
+    	sudo chmod 755 /etc/init.d/service.sh
+    	sudo update-rc.d service.sh defaults
+
