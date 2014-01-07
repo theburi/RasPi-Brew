@@ -54,3 +54,7 @@ I2C SUB
     	wireless-channel 1
     	wireless-essid MyNETWORK
     	wireless-mode ad-hoc
+    	
+    **  sudo cp service.sh /etc/init.d
+    	sudo chmod 755 /etc/init.d/service.sh
+
