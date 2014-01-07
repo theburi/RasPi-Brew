@@ -1,19 +1,23 @@
+import os
 import time
 import RPi.GPIO as GPIO
 
-
+initialize = False
 # This is the address we setup in the Arduino Program
 heatpin = 11
-temperatureAddress='28-000003ca28a5'
+pumppin = 10
+temperatureAddress = '28-000003ca28a5'
 
 
 # Use the pin numbers from the ribbon cable board.
 GPIO.setmode(GPIO.BCM)
 # Set up the pin you are using ("18" is an example) as output.
 GPIO.setup(heatpin, GPIO.OUT)
+GPIO.setup(pumppin, GPIO.OUT)
 
 t = 0
 heat = False
+GPIO.output(pumppin, GPIO.HIGH)
 
 
 def HeatPower(val):
@@ -31,19 +35,27 @@ def HeatPower(val):
 
 def GetTemperature():
     global t
+    global initialize
     #if heat:
     #    t += 5
     #else:
     #    if t > 0: t -= 1
+    if os.path.exists("/sys/bus/w1/devices/%s/w1_slave" % temperatureAddress):
+        tfile = open("/sys/bus/w1/devices/%s/w1_slave" % temperatureAddress)
+        text = tfile.read()
+        tfile.close()
 
-    tfile = open("/sys/bus/w1/devices/%s/w1_slave" % temperatureAddress)
-    text = tfile.read()
-    tfile.close()
-    temperature_data = text.split()[-1]
-    t = float(temperature_data[2:])
-    t /= 1000
+        temperature_data = text.split()[-1]
+        t = float(temperature_data[2:])
+        t /= 1000
+        if not initialize:
+            if t == 85:
+                raise Exception('Temperature probe is not configure properly Exit Code 8500')
+            initialize = True
 
-    return t
+        return t
+
+    raise Exception('Temperature probe is not working')
 
 
 def resetHeatOutput(vessel):

@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 ## this is a main module to run main loop
+import logging
 from random import random
 import traceback
 from steplogic import *
@@ -42,7 +45,7 @@ def LoadProgram():
 
     BrewConfig["StartDelayMinutes"] = 0
     BrewConfig["MASH_TEMP"] = [30, 40, 50, 60, 70, 80]
-    BrewConfig["MASH_MINUTES"] = [0, 0, 0, 0, 1, 1]
+    BrewConfig["MASH_MINUTES"] = [0, 0, 0, 1, 5, 5]
     BrewConfig["StrikeWaterTemp"] = 70
     BrewConfig["BOIL_TEMP"] = 100
     BrewConfig["BOIL_TIME"] = 5
@@ -86,20 +89,44 @@ def WriteState():
 ##
 ## Start of main section
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# create a file handler
+handler = logging.FileHandler('brewpi.log')
+handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(handler)
+
+logger.info('Starting BrewPi ....')
+
 LoadProgram()
 
 while not EXIT:
-    updateTimers()
 
-    temp[VS_MASH] = GetTemperature()
+    try:
+        updateTimers()
 
-    UpdateOutputs()
+        temp[VS_MASH] = GetTemperature()
 
-    ##processUserCommands()
+        UpdateOutputs()
 
-    WriteState()
+        ##processUserCommands()
 
-    EXIT = stepCore()
+        WriteState()
+
+        EXIT = stepCore()
+
+    except Exception as e:
+
+        logger.critical(e.message, exc_info=True)
+        time.sleep(100)
 
     time.sleep(2)
+
 
