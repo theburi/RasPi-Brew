@@ -57,4 +57,5 @@ I2C SUB
     	
     **  sudo cp service.sh /etc/init.d
     	sudo chmod 755 /etc/init.d/service.sh
+    	sudo update-rc.d service.sh defaults
 
